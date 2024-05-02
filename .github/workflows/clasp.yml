@@ -15,7 +15,7 @@ jobs:
 
         steps:
             - name: Clasp Action
-              uses: daikikatsuragawa/clasp-action@v1.1.0
+              uses: FieryRMS/clasp-action@v1.1.1
               with:
                   accessToken: ${{ secrets.ACCESS_TOKEN }}
                   idToken: ${{ secrets.ID_TOKEN }}
@@ -25,4 +25,4 @@ jobs:
                   scriptId: ${{ secrets.SCRIPT_ID }}
                   command: "deploy"
                   deployId: ${{ secrets.DEPLOY_ID }}
-                  description: "\"Github Actions: clasp deploy\""
+                  description: "Github Actions: clasp deploy"
