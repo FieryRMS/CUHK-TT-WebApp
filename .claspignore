@@ -1,0 +1,12 @@
+.gitignore
+package-lock.json
+package.json
+tsconfig.json
+./dist
+
+# wtf ???
+**/node_modules/**
+node_modules
+/node_modules
+node_modules/**/.*
+node_modules/**/.*/**

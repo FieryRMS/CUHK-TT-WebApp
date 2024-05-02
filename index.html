@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>CUHK TT</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+
+        #success {
+            color: green;
+        }
+
+        #error {
+            color: red;
+        }
+
+        #statusbar>div>pre {
+            display: inline;
+            font-family: inherit;
+            margin: 0;
+        }
+    </style>
+    <script>
+    </script>
+</head>
+
+<body>
+    <h2>CUHK TT</h2>
+    <div>
+        <form>
+            <fieldset id="login" name="login">
+                <legend>Login</legend>
+                <label>Student ID:<br>
+                    <input type="text" id="username" name="username" required autocomplete="on">
+                </label>
+                <br>
+
+                <label>Password:<br>
+                    <input type="password" id="password" name="password" required autocomplete="on">
+                </label>
+                <br>
+
+                <input type="submit" value="submit">
+            </fieldset>
+        </form>
+    </div>
+    <div>
+        <form>
+            <fieldset id="options" name="options" class="hidden">
+                <legend>Options</legend>
+                <fieldset id="terms" name="terms">
+                    <legend>Select terms to add</legend>
+                </fieldset>
+
+                <label>
+                    Name of the calendar to create:<br>
+                    <input type="text" id="calname" name="calname" value="Class TT">
+                </label><br>
+
+                <label>
+                    <input type="checkbox" id="usehtml" name="usehtml" checked>
+                    Use HTML for descriptions
+                </label>
+                <br>
+                <input type="submit" value="submit">
+            </fieldset>
+        </form>
+    </div>
+    <form>
+        <fieldset id="statusbar">
+            <legend>statusbar</legend>
+            <div id="loading" class="">Login details are not kept serverside. Schedule data is deleted after
+                <?= expiry ?>s. This project is <a href="https://github.com/FieryRMS/CUHK-TT-WebApp"
+                    target="_blank">opensource</a>.
+            </div>
+            <div id="success" class="hidden">Success!</div>
+            <div id="error" class="hidden">Error</div>
+        </fieldset>
+    </form>
+
+    <script>
+        /**
+         * @param {"loading" | "success" | "error"} status
+         * @param {string} message
+         */
+        function setStatus(status, message) {
+            document.querySelectorAll("#statusbar > div").forEach((x) => x.classList.add("hidden"));
+            document.getElementById(status).classList?.remove("hidden");
+            document.getElementById(status).innerHTML = message;
+        }
+        function getStatus() {
+            return document.getElementById("statusbar").querySelector("div:not(.hidden)")?.id;
+        }
+
+        document.getElementById("login").parentElement.addEventListener("submit", (e) => {
+            e.preventDefault();
+            setStatus("loading", "Loading...");
+            document.getElementById("login").setAttribute("disabled", "disabled");
+
+            google.script.run
+                .withSuccessHandler(showOptionForm)
+                .withFailureHandler((e) => {
+                    setStatus("error", e.message);
+                    document.getElementById("login").removeAttribute("disabled");
+                })
+                .getTermList(e.target["username"].value, e.target["password"].value);
+            return false;
+        });
+
+        /** @param {string[]} data */
+        function showOptionForm(data) {
+            setStatus("success", "Success!");
+            document.getElementById("login").classList.add("hidden");
+            document.getElementById("options").classList.remove("hidden");
+
+            data.termlist.forEach((term, i) => {
+                let label = document.createElement("label");
+                let input = document.createElement("input");
+                input.type = "checkbox";
+                input.name = "term";
+                input.value = term;
+                input.dataset.cnt = data.cntlist[i];
+                label.appendChild(input);
+                label.appendChild(document.createTextNode(term));
+                label.appendChild(document.createElement("br"));
+                document.getElementById("terms").appendChild(label);
+            });
+            document.getElementById("terms").lastElementChild.firstElementChild.checked = true;
+        }
+
+        document.getElementById("options").parentElement.addEventListener("submit", (e) => {
+            e.preventDefault();
+            var processingStatusText = (done, total) => `Processing. This may take a while... <pre>${done}/${total}</pre>`;
+
+            document.getElementById("options").setAttribute("disabled", "disabled");
+
+            let terms = [...e.target["terms"].querySelectorAll("input:checked")].map(x => x.value);
+            let total = [...e.target["terms"].querySelectorAll("input:checked")]
+                .reduce((acc, x) => acc + parseInt(x.dataset.cnt), 0).toString();
+            let usehtml = e.target["usehtml"].checked;
+            let calname = e.target["calname"].value;
+            let done = ' '.repeat(total.length - 1) + '0';
+            setStatus("loading", processingStatusText(done, total));
+
+            google.script.run
+                .withSuccessHandler(() => setStatus("success", "Success!"))
+                .withFailureHandler((e) => {
+                    setStatus("error", e.message);
+                    document.getElementById("options").removeAttribute("disabled");
+                })
+                .createCalendar(terms, usehtml, calname);
+
+            setTimeout(() => {
+                let timer = setInterval(() => {
+                    console.log("polling");
+                    google.script.run
+                        .withSuccessHandler((e) => {
+                            if (getStatus() === "loading") {
+                                let done = e.done;
+                                done = ' '.repeat(e.total.length - done.length) + done;
+                                setStatus("loading", processingStatusText(done, e.total));
+                            }
+                            else clearInterval(timer);
+                        })
+                        .withFailureHandler((e) => {
+                            console.warn(e);
+                            clearInterval(timer);
+                        })
+                        .pollProgress();
+                }, 4000);
+            }, 1000);
+            return false;
+        });
+    </script>
+</body>
+
+</html>

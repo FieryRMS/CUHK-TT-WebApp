@@ -1,0 +1,36 @@
+{
+  "timeZone": "Asia/Hong_Kong",
+  "dependencies": {
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Calendar",
+        "version": "v3",
+        "serviceId": "calendar"
+      }
+    ]
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/calendar.app.created",
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/calendar.addons.execute"
+  ],
+  "addOns": {
+    "common": {
+      "name": "CUHK TT",
+      "logoUrl": "https://www.cuhk.edu.hk/english/images/aboutus/logo.jpg",
+      "homepageTrigger": {
+        "runFunction": "onHomepage"
+      }
+    },
+    "calendar": {}
+  },
+  "urlFetchWhitelist": [
+    "https://campusapps.itsc.cuhk.edu.hk/store/CLASSSCHD/STT.asmx/GetTimeTable"
+  ],
+  "webapp": {
+    "executeAs": "USER_DEPLOYING",
+    "access": "ANYONE_ANONYMOUS"
+  }
+}
