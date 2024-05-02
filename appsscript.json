@@ -19,7 +19,7 @@
     "https://campusapps.itsc.cuhk.edu.hk/store/CLASSSCHD/STT.asmx/GetTimeTable"
   ],
   "webapp": {
-    "executeAs": "USER_DEPLOYING",
-    "access": "ANYONE_ANONYMOUS"
+    "executeAs": "USER_ACCESSING",
+    "access": "ANYONE"
   }
 }

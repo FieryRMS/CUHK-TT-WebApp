@@ -71,8 +71,8 @@
     <form>
         <fieldset id="statusbar">
             <legend>statusbar</legend>
-            <div id="loading" class="">Login details are not kept serverside. Max lifetime of schedule data =
-                <?= expiry ?>s. Data deleted after calendar creation. This project is <a
+            <div id="loading" class="">Login details are never stored. Max lifetime of schedule data =
+                <?= expiry ?>s. Data is deleted after calendar creation. This project is <a
                     href="https://github.com/FieryRMS/CUHK-TT-WebApp" target="_blank">opensource</a>.
             </div>
             <div id="success" class="hidden">Success!</div>
@@ -132,8 +132,6 @@
 
         document.getElementById("options").parentElement.addEventListener("submit", (e) => {
             e.preventDefault();
-            var processingStatusText = (done, total) => `Processing. This may take a while... <pre>${done}/${total}</pre>`;
-
             document.getElementById("options").setAttribute("disabled", "disabled");
 
             let terms = [...e.target["terms"].querySelectorAll("input:checked")].map(x => x.value);
@@ -141,38 +139,104 @@
                 .reduce((acc, x) => acc + parseInt(x.dataset.cnt), 0).toString();
             let usehtml = e.target["usehtml"].checked;
             let calname = e.target["calname"].value;
-            let done = ' '.repeat(total.length - 1) + '0';
-            setStatus("loading", processingStatusText(done, total));
+            var progressUpdater = new ProgressUpdater(total);
 
             google.script.run
-                .withSuccessHandler(() => setStatus("success", "Success!"))
+                .withSuccessHandler(() => setStatus("success", "Success! Please check your calendar."))
                 .withFailureHandler((e) => {
                     setStatus("error", e.message);
                     document.getElementById("options").removeAttribute("disabled");
                 })
                 .createCalendar(terms, usehtml, calname);
 
-            setTimeout(() => {
-                let timer = setInterval(() => {
-                    console.log("polling");
-                    google.script.run
-                        .withSuccessHandler((e) => {
-                            if (getStatus() === "loading") {
-                                let done = e.done;
-                                done = ' '.repeat(e.total.length - done.length) + done;
-                                setStatus("loading", processingStatusText(done, e.total));
-                            }
-                            else clearInterval(timer);
-                        })
-                        .withFailureHandler((e) => {
-                            console.warn(e);
-                            clearInterval(timer);
-                        })
-                        .pollProgress();
-                }, 4000);
-            }, 1000);
+            progressUpdater.start();
             return false;
         });
+
+        class ProgressUpdater {
+            static #realPoll = 4000;
+            static #fakePoll = 800;
+            static #fakePollFluctuation = 200;
+            static #fakePollRatio = 0.9;
+            static #fakePollRatioFluctuation = 0.2;
+            constructor(total) {
+                this.total = total;
+                this.done = 0;
+                this.showdone = 0;
+                this.failcnt = 1;
+                this.interval = null;
+
+                this.setStatus(true);
+                this.running = false;
+            }
+            start() {
+                this.running = true;
+                this.startTime = performance.now();
+                this.endTime = this.startTime;
+                this.interval = setInterval(() => {
+                    if (!this.running) {
+                        this.stop.bind(this)();
+                        return;
+                    }
+                    google.script.run
+                        .withSuccessHandler(this.realProgress.bind(this))
+                        .withFailureHandler(this.fail.bind(this))
+                        .pollProgress();
+                }, ProgressUpdater.#realPoll);
+
+                this.fakeProgress();
+            }
+            stop() {
+                this.running = false;
+                clearInterval(this.interval);
+            }
+            fail(e) {
+                this.failcnt--;
+                if (this.failcnt <= 0) {
+                    this.stop();
+                    setStatus("error", e.message);
+                }
+            }
+            fakeProgress() {
+                if (!this.running) return;
+                let delta = this.endTime - this.startTime;
+                let speed = this.done;
+                if (delta == 0) speed = 0;
+                else speed = (this.done / delta);
+
+                let currTime = performance.now();
+                let RatioFluctuation = ProgressUpdater.#fakePollRatio;
+                RatioFluctuation += (Math.random() - 0.5) * ProgressUpdater.#fakePollRatioFluctuation;
+                let nextVal = (currTime - this.startTime) * speed * RatioFluctuation;
+
+                nextVal = Math.min(this.total, Math.floor(nextVal));
+
+                if (nextVal > this.showdone) this.showdone = nextVal;
+                this.setStatus();
+
+                let nextCall = ProgressUpdater.#fakePoll;
+                nextCall += (Math.random() - 0.5) * ProgressUpdater.#fakePollFluctuation;
+                setTimeout(this.fakeProgress.bind(this), nextCall);
+            }
+            realProgress(e) {
+                this.total = parseInt(e.total);
+                this.done = parseInt(e.done);
+                this.endTime = performance.now();
+                if (this.done >= this.total) this.stop();
+            }
+            setStatus(force = false) {
+                if (!this.running && !force) return;
+                if (getStatus() !== "loading" && !force) {
+                    this.stop();
+                    return;
+                }
+                let total = this.total.toString();
+                let done = this.showdone.toString();
+                done = ' '.repeat(total.length - done.length) + done;
+                setStatus("loading", `Processing. This may take a while... <pre>${done}/${total}</pre>`);
+            }
+        }
+
     </script>
 </body>
 
