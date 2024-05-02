@@ -29,7 +29,7 @@
 <body>
     <h2>CUHK TT</h2>
     <div>
-        <form>
+        <form target="save" action="about:blank">
             <fieldset id="login" name="login">
                 <legend>Login</legend>
                 <label>Student ID:<br>
@@ -47,7 +47,7 @@
         </form>
     </div>
     <div>
-        <form>
+        <form target="save" action="about:blank">
             <fieldset id="options" name="options" class="hidden">
                 <legend>Options</legend>
                 <fieldset id="terms" name="terms">
@@ -79,6 +79,7 @@
             <div id="error" class="hidden">Error</div>
         </fieldset>
     </form>
+    <iframe name="save" style="display:none" src="about:blank"></iframe>
 
     <script>
         /**
@@ -95,7 +96,6 @@
         }
 
         document.getElementById("login").parentElement.addEventListener("submit", (e) => {
-            e.preventDefault();
             setStatus("loading", "Loading...");
             document.getElementById("login").setAttribute("disabled", "disabled");
 
@@ -106,7 +106,6 @@
                     document.getElementById("login").removeAttribute("disabled");
                 })
                 .getTermList(e.target["username"].value, e.target["password"].value);
-            return false;
         });
 
         /** @param {string[]} data */
@@ -131,7 +130,6 @@
         }
 
         document.getElementById("options").parentElement.addEventListener("submit", (e) => {
-            e.preventDefault();
             document.getElementById("options").setAttribute("disabled", "disabled");
 
             let terms = [...e.target["terms"].querySelectorAll("input:checked")].map(x => x.value);
@@ -150,7 +148,6 @@
                 .createCalendar(terms, usehtml, calname);
 
             progressUpdater.start();
-            return false;
         });
 
         class ProgressUpdater {
