@@ -1,9 +1,30 @@
 {
   "devDependencies": {
+    "@types/aes-js": "^3.1.4",
+    "@types/google-apps-script": "^1.0.83",
     "typescript": "^5.4.5"
   },
-  "dependencies": {
-    "@types/aes-js": "^3.1.4",
-    "@types/google-apps-script": "^1.0.83"
-  }
+  "name": "cuhk-tt-webapp",
+  "description": "A google Appscript webapp that gets and adds CUHK class schedule to google calendar",
+  "version": "1.0.0",
+  "main": "main.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FieryRMS/CUHK-TT-WebApp.git"
+  },
+  "keywords": [
+    "appscript",
+    "google-appscript",
+    "webapp",
+    "cuhk",
+    "timetable",
+    "schedule",
+    "google-calendar"
+  ],
+  "author": "FieryRMS",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/FieryRMS/CUHK-TT-WebApp/issues"
+  },
+  "homepage": "https://github.com/FieryRMS/CUHK-TT-WebApp#readme"
 }

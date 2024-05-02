@@ -13,19 +13,8 @@
   "runtimeVersion": "V8",
   "oauthScopes": [
     "https://www.googleapis.com/auth/calendar.app.created",
-    "https://www.googleapis.com/auth/script.external_request",
-    "https://www.googleapis.com/auth/calendar.addons.execute"
+    "https://www.googleapis.com/auth/script.external_request"
   ],
-  "addOns": {
-    "common": {
-      "name": "CUHK TT",
-      "logoUrl": "https://www.cuhk.edu.hk/english/images/aboutus/logo.jpg",
-      "homepageTrigger": {
-        "runFunction": "onHomepage"
-      }
-    },
-    "calendar": {}
-  },
   "urlFetchWhitelist": [
     "https://campusapps.itsc.cuhk.edu.hk/store/CLASSSCHD/STT.asmx/GetTimeTable"
   ],
