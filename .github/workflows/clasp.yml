@@ -24,5 +24,5 @@ jobs:
                   clientSecret: ${{ secrets.CLIENT_SECRET }}
                   scriptId: ${{ secrets.SCRIPT_ID }}
                   command: "deploy"
-                  deployId: ${{ secrets.GITHUB_TOKEN }}
-                  description: "'Github Actions: clasp deploy'"
+                  deployId: ${{ secrets.DEPLOY_ID }}
+                  description: "\"Github Actions: clasp deploy\""
