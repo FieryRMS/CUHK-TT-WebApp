@@ -21,6 +21,11 @@
     "schedule",
     "google-calendar"
   ],
+  "scripts": {
+    "push": "clasp push",
+    "livepush": "clasp push -w",
+    "deploy": "if [[ $npm_config_deploymentid ]]; then clasp deploy -i ${npm_config_deploymentid}; else echo 'Please set deploymentid'; fi"
+  },
   "author": "FieryRMS",
   "license": "MIT",
   "bugs": {
