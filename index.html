@@ -155,7 +155,7 @@
             static #fakePoll = 800;
             static #fakePollFluctuation = 200;
             static #fakePollRatio = 0.9;
-            static #fakePollRatioFluctuation = 0.2;
+            static #fakePollRatioFluctuation = 0.1;
             constructor(total) {
                 this.total = total;
                 this.done = 0;
@@ -204,7 +204,8 @@
                 let currTime = performance.now();
                 let RatioFluctuation = ProgressUpdater.#fakePollRatio;
                 RatioFluctuation += (Math.random() - 0.5) * ProgressUpdater.#fakePollRatioFluctuation;
-                let nextVal = (currTime - this.startTime) * speed * RatioFluctuation;
+                let nextVal = (currTime - this.startTime) * speed;
+                nextVal = (nextVal - this.showdone) * RatioFluctuation + this.showdone;
 
                 nextVal = Math.min(this.total, Math.floor(nextVal));
 

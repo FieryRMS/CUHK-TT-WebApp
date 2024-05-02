@@ -1,7 +1,3 @@
-// function onHomepage() {
-//     return HtmlService.createHtmlOutputFromFile('index');
-// }
-
 function doGet() {
     let template = HtmlService.createTemplateFromFile("index");
     template.expiry = expiry;
@@ -68,6 +64,8 @@ function createCalendar(terms: string[], usehtml: boolean, calname: string) {
         done++;
         UserCache.put("done", done.toString(), expiry);
     }
+    UserCache.remove("total");
+    UserCache.remove("done");
 }
 
 function pollProgress() {
