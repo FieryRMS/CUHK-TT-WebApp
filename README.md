@@ -1,5 +1,9 @@
 # CUHK-TT-WebApp
 
+[![clasp](https://img.shields.io/badge/built%20with-clasp-4285f4.svg)](https://github.com/google/clasp)
+[![deploy status](https://img.shields.io/github/actions/workflow/status/FieryRMS/CUHK-TT-WebApp/clasp.yml?label=deploy
+)](https://fieryrms.github.io/CUHK-TT-WebApp)
+
 A google Appscript webapp that gets and adds CUHK class schedule to google calendar.
 
 Demo: <https://fieryrms.github.io/CUHK-TT-WebApp>

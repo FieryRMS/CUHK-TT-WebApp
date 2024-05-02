@@ -1,29 +1,28 @@
 name: clasp deploy
 
 on:
-  push:
-    branches: [ "master" ]
+    push:
+        branches: ["master"]
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    environment: clasp
+    deploy:
+        runs-on: ubuntu-latest
+        environment: clasp
 
-    strategy:
-      matrix:
-        node-version: [ 21.x ]
+        strategy:
+            matrix:
+                node-version: [21.x]
 
-    steps:
-      - name: Clasp Action
-        uses: daikikatsuragawa/clasp-action@v1.1.0
-        with:
-          accessToken: ${{ secrets.ACCESS_TOKEN }}
-          idToken: ${{ secrets.ID_TOKEN }}
-          refreshToken: ${{ secrets.REFRESH_TOKEN }}
-          clientId: ${{ secrets.CLIENT_ID }}
-          clientSecret: ${{ secrets.CLIENT_SECRET }}
-          scriptId: ${{ secrets.SCRIPT_ID }}
-          command: 'deploy'
-          deployId: ${{ secrets.DEPLOY_ID }}
-          description: 'Github Actions: clasp deploy'
-            
+        steps:
+            - name: Clasp Action
+              uses: daikikatsuragawa/clasp-action@v1.1.0
+              with:
+                  accessToken: ${{ secrets.ACCESS_TOKEN }}
+                  idToken: ${{ secrets.ID_TOKEN }}
+                  refreshToken: ${{ secrets.REFRESH_TOKEN }}
+                  clientId: ${{ secrets.CLIENT_ID }}
+                  clientSecret: ${{ secrets.CLIENT_SECRET }}
+                  scriptId: ${{ secrets.SCRIPT_ID }}
+                  command: "deploy"
+                  deployId: ${{ secrets.GITHUB_TOKEN }}
+                  description: "'Github Actions: clasp deploy'"
