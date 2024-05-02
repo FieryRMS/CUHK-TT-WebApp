@@ -47,6 +47,7 @@ function createCalendar(terms: string[], usehtml: boolean, calname: string) {
     if (data_str === null) {
         throw new DataNotFound();
     }
+    UserCache.remove("data");
 
     let data: Entry[] | null = JSON.parse(data_str);
     data = data.filter((x) => terms.indexOf(x.STRM_DESCR) !== -1);
