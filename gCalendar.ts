@@ -35,18 +35,29 @@ class CalendarHandler {
     }
 
     private static getDescr(event_record: Entry, html: boolean): string {
+        const buildingName = BuildingMap[event_record.BLDG_CD];
+        const mapurl =
+            "https://www.google.com/maps/search/" +
+            encodeURIComponent(
+                buildingName ? buildingName : event_record.FDESCR
+            ) +
+            "/@" +
+            event_record.LAT.trim() +
+            "," +
+            event_record.LNG.trim() +
+            ",19z";
         const HTMLFORMAT = `<h2>${event_record.DESCR} (${event_record.CATALOG_NBR})
-    ${event_record.STRM_DESCR}</h2><p><strong>Location</strong>: ${event_record.FDESCR}
-    <strong>Instructor(s)</strong>: ${event_record.INSTRUCTORS}
-    <strong>Component</strong>: ${event_record.COMDESC}
-    <strong>Section</strong>: ${event_record.CLASS_SECTION}</p>`;
+${event_record.STRM_DESCR}</h2><p><strong>Location</strong>: <a href="${mapurl}">${event_record.FDESCR}</a>
+<strong>Instructor(s)</strong>: ${event_record.INSTRUCTORS}
+<strong>Component</strong>: ${event_record.COMDESC}
+<strong>Section</strong>: ${event_record.CLASS_SECTION}</p>`;
 
         const PLAINFORMAT = `${event_record.DESCR} (${event_record.CATALOG_NBR})
-    ${event_record.STRM_DESCR}
-    Location: ${event_record.FDESCR}
-    Instructor(s): ${event_record.INSTRUCTORS}
-    Component: ${event_record.COMDESC}
-    Section: ${event_record.CLASS_SECTION}`;
+${event_record.STRM_DESCR}
+Location: ${mapurl}
+Instructor(s): ${event_record.INSTRUCTORS}
+Component: ${event_record.COMDESC}
+Section: ${event_record.CLASS_SECTION}`;
 
         return html ? HTMLFORMAT : PLAINFORMAT;
     }
@@ -103,7 +114,7 @@ class CalendarHandler {
                 dateTime: this.getEndDateTime(event_record),
                 timeZone: "Asia/Hong_Kong",
             },
-            location: `${event_record.LAT} ${event_record.LNG}`,
+            location: event_record.FDESCR,
             recurrence: this.getRecurrence(event_record),
             start: {
                 dateTime: this.getStartDateTime(event_record),
@@ -121,7 +132,11 @@ class CalendarHandler {
     }
     insert(event_record: Entry, useHtml: boolean) {
         let colorId = this.colorGen.next(event_record).value;
-        let event = CalendarHandler.getEventObject(event_record, colorId, useHtml);
+        let event = CalendarHandler.getEventObject(
+            event_record,
+            colorId,
+            useHtml
+        );
         Calendar.Events.insert(event, this.calendarId);
     }
 }
