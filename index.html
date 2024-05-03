@@ -191,7 +191,8 @@
                 this.failcnt--;
                 if (this.failcnt <= 0) {
                     this.stop();
-                    setStatus("error", e.message);
+                    if (getStatus() === "loading")
+                        setStatus("error", e.message);
                 }
             }
             fakeProgress() {

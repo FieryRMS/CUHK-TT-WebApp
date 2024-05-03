@@ -34,12 +34,14 @@ type Entry = Record<EntryKeys, string> & {
 
 var UserCache = CacheService.getUserCache();
 const expiry = 300;
+const progress_expiry = 10;
 
 class InvalidCredentials extends Error {
     constructor(message = "") {
         super(message);
         this.name = "InvalidCredentials";
-        if (message == "") this.message = "Invalid ID or password";
+        this.message = "Invalid credentials;";
+        if (message != "") this.message += " " + message;
     }
 }
 
@@ -47,8 +49,7 @@ class DataNotFound extends Error {
     constructor(message = "") {
         super(message);
         this.name = "DataNotFound";
-        if (message == "")
-            this.message =
-                "Data has possibly expired. lifetime=" + expiry + "s";
+        this.message = "Data has possibly expired or deleted. lifetime=" + expiry + "s;";
+        if (message != "") this.message += " " + message;
     }
 }

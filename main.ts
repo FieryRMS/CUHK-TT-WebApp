@@ -19,7 +19,7 @@ function getTermList(id: string, passw: string) {
         XmlService.parse(res.getContentText()).getRootElement().getText()
     );
     if (data.length === 0) {
-        throw new InvalidCredentials();
+        throw new InvalidCredentials("ID or password is incorrect.");
     }
 
     UserCache.put("data", JSON.stringify(data), expiry);
@@ -41,7 +41,7 @@ function getTermList(id: string, passw: string) {
 function createCalendar(terms: string[], usehtml: boolean, calname: string) {
     let data_str = UserCache.get("data");
     if (data_str === null) {
-        throw new DataNotFound();
+        throw new DataNotFound("Schedule not found. Please re-login.");
     }
     UserCache.remove("data");
 
@@ -64,7 +64,9 @@ function createCalendar(terms: string[], usehtml: boolean, calname: string) {
         done++;
         UserCache.put("done", done.toString(), expiry);
     }
-    UserCache.remove("total");
+
+    UserCache.put("total", total.toString(), progress_expiry);
+    UserCache.put("done", done.toString(), progress_expiry);
     UserCache.remove("done");
 }
 
@@ -72,7 +74,9 @@ function pollProgress() {
     let total = UserCache.get("total");
     let done = UserCache.get("done");
     if (total === null || done === null) {
-        throw new DataNotFound();
+        throw new DataNotFound(
+            "Failed to get progress. Calendar may still be created."
+        );
     }
 
     return { total, done };
