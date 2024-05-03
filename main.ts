@@ -1,7 +1,9 @@
 function doGet() {
     let template = HtmlService.createTemplateFromFile("index");
     template.expiry = expiry;
-    return template.evaluate();
+    return template
+        .evaluate()
+        .addMetaTag("viewport", "width=device-width, initial-scale=1");
 }
 
 function getTermList(id: string, passw: string) {

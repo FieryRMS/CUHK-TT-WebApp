@@ -5,10 +5,5 @@ tsconfig.json
 ./dist
 .npmrc
 LICENSE
-
-# wtf ???
-**/node_modules/**
-node_modules
-/node_modules
-node_modules/**/.*
-node_modules/**/.*/**
+temp/**
+node_modules/**
